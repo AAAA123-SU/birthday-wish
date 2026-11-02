@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0a14">
+<title>生日快乐 🎂</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎂</text></svg>">
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: #0b0a14;
+    color: #fff;
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(46vw 46vw at 16% 12%, rgba(255, 92, 141, .30), transparent 62%),
+      radial-gradient(40vw 40vw at 84% 20%, rgba(120, 110, 255, .28), transparent 64%),
+      radial-gradient(52vw 52vw at 50% 96%, rgba(255, 176, 84, .20), transparent 66%),
+      radial-gradient(38vw 38vw at 78% 78%, rgba(64, 214, 190, .18), transparent 64%);
+    filter: blur(6px);
+  }
+
+  .stage { position: fixed; inset: 0; }
+
+  .card {
+    position: absolute;
+    max-width: 74vw;
+    border-radius: 16px;
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.35;
+    text-align: center;
+    letter-spacing: .02em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .22);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .35),
+      0 14px 34px rgba(0, 0, 0, .32);
+    transform: translate(-50%, -50%) rotate(var(--r)) scale(calc(var(--s) * .55));
+    opacity: 0;
+    will-change: transform, opacity;
+    animation: pop .46s cubic-bezier(.34, 1.56, .64, 1) forwards;
+    user-select: none;
+  }
+
+  @keyframes pop {
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) rotate(var(--r)) scale(var(--s));
+    }
+  }
+
+  .card.out {
+    animation: out .34s ease forwards;
+  }
+
+  @keyframes out {
+    to {
+      opacity: 0;
+      transform: translate(-50%, -50%) rotate(var(--r)) scale(calc(var(--s) * .78));
+    }
+  }
+
+  .bar {
+    position: fixed;
+    left: 50%;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    transform: translate(-50%, 12px);
+    padding: 9px 18px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .10);
+    border: 1px solid rgba(255, 255, 255, .14);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: rgba(255, 255, 255, .82);
+    font-size: 13px;
+    letter-spacing: .04em;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity .4s ease, transform .4s ease;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .bar.show { opacity: 1; transform: translate(-50%, 0); }
+
+  .done {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    text-align: center;
+    padding: 24px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .5s ease, visibility .5s;
+    z-index: 10;
+  }
+
+  .done.show { opacity: 1; visibility: visible; }
+
+  .done h1 {
+    margin: 0;
+    font-size: clamp(28px, 7vw, 52px);
+    letter-spacing: .04em;
+    background: linear-gradient(100deg, #ffd166, #ff8fab 42%, #a78bfa 78%, #6ee7e0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 6px 22px rgba(255, 143, 171, .28));
+  }
+
+  .done p {
+    margin: 0;
+    color: rgba(255, 255, 255, .68);
+    font-size: clamp(13px, 3.4vw, 16px);
+    letter-spacing: .06em;
+  }
+
+  .done button {
+    margin-top: 10px;
+    padding: 12px 30px;
+    border: 0;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1024;
+    background: linear-gradient(135deg, #ffd88f, #ff9db5);
+    box-shadow: 0 12px 30px rgba(255, 157, 181, .32);
+    cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+
+  .done button:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(255, 157, 181, .42); }
+  .done button:active { transform: translateY(0) scale(.97); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { animation-duration: .01s; }
+  }
+</style>
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+  <main class="stage" id="stage"></main>
+  <div class="bar" id="bar">轻触屏幕或按 ESC 停止</div>
+
+  <section class="done" id="done">
+    <h1 id="doneTitle">生日快乐 🎂</h1>
+    <p>祝你所愿皆成真，日日都有小确幸</p>
+    <button id="again" type="button">再放一次</button>
+  </section>
+
+<script>
+(function () {
+  'use strict';
+
+  var stage = document.getElementById('stage');
+  var bar = document.getElementById('bar');
+  var done = document.getElementById('done');
+  var doneTitle = document.getElementById('doneTitle');
+  var again = document.getElementById('again');
+
+  var TIPS = [
+    '生日快乐 🎂',
+    '天天开心 🎉',
+    '愿望成真 ✨',
+    '前程似锦 🌟',
+    '笑口常开 😄',
+    '好运常在 🍀',
+    '岁岁平安 🎈',
+    '万事胜意 🎊',
+    '未来可期 🚀',
+    '被世界温柔以待 🌈',
+    '眼里有光，心中有爱 💖',
+    '愿你历经千帆，归来仍是少年 ⛵',
+    '发财暴富 💰',
+    '今天你最可爱 🥳'
+  ];
+
+  var GRADIENTS = [
+    'linear-gradient(135deg, #ff9bb5, #f2456d)',
+    'linear-gradient(135deg, #ffcf6b, #f58823)',
+    'linear-gradient(135deg, #8be8c8, #23a68a)',
+    'linear-gradient(135deg, #93c5fd, #3b76e8)',
+    'linear-gradient(135deg, #c9a6ff, #7c4dff)',
+    'linear-gradient(135deg, #7fe6e0, #17a2b8)',
+    'linear-gradient(135deg, #ffb3a1, #f2604a)',
+    'linear-gradient(135deg, #f7a8dc, #ce3bc0)',
+    'linear-gradient(135deg, #ffd8a8, #e08a2e)',
+    'linear-gradient(135deg, #a7f3d0, #2f9e6b)'
+  ];
+
+  var cards = [];
+  var spawnTimer = null;
+  var playing = false;
+  var isMobile = window.matchMedia('(max-width: 640px)').matches;
+
+  var to = new URLSearchParams(location.search).get('to');
+  if (to) {
+    to = to.slice(0, 12);
+    document.title = to + '，生日快乐 🎂';
+    doneTitle.textContent = to + '，生日快乐 🎂';
+  }
+
+  function rand(min, max) {
+    return min + Math.random() * (max - min);
+  }
+
+  function pick(list) {
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
+  function spawn() {
+    var el = document.createElement('div');
+    el.className = 'card';
+    el.textContent = pick(TIPS);
+
+    var base = isMobile ? 13.5 : 16;
+    var size = rand(base, base + (isMobile ? 4.5 : 7));
+
+    el.style.left = rand(10, 90).toFixed(2) + '%';
+    el.style.top = rand(11, 89).toFixed(2) + '%';
+    el.style.fontSize = size.toFixed(1) + 'px';
+    el.style.padding = rand(11, 19).toFixed(0) + 'px ' + rand(15, 26).toFixed(0) + 'px';
+    el.style.background = pick(GRADIENTS);
+    el.style.setProperty('--r', rand(-7, 7).toFixed(2) + 'deg');
+    el.style.setProperty('--s', rand(0.86, 1.08).toFixed(3));
+
+    stage.appendChild(el);
+    cards.push(el);
+  }
+
+  function clearStage() {
+    stage.textContent = '';
+    cards = [];
+  }
+
+  function stop() {
+    if (!playing) return;
+    playing = false;
+    clearTimeout(spawnTimer);
+
+    var list = cards.slice();
+    list.forEach(function (el, i) {
+      setTimeout(function () { el.classList.add('out'); }, i * 9);
+    });
+
+    var settle = list.length * 9 + 360;
+    setTimeout(function () {
+      clearStage();
+      bar.classList.remove('show');
+      done.classList.add('show');
+      again.focus({ preventScroll: true });
+    }, settle);
+  }
+
+  function play() {
+    clearStage();
+    done.classList.remove('show');
+    bar.classList.add('show');
+    playing = true;
+
+    var total = isMobile ? 52 : 92;
+    var i = 0;
+
+    (function tick() {
+      if (!playing) return;
+      spawn();
+      i += 1;
+      if (i < total) {
+        spawnTimer = setTimeout(tick, 44);
+      } else {
+        spawnTimer = setTimeout(function () {
+          bar.textContent = '点一下屏幕收起这些祝福';
+        }, 600);
+      }
+    })();
+  }
+
+  again.addEventListener('click', function (e) {
+    e.stopPropagation();
+    bar.textContent = '轻触屏幕或按 ESC 停止';
+    play();
+  });
+
+  document.addEventListener('pointerdown', function (e) {
+    if (e.target.closest('.done')) return;
+    if (playing) stop();
+  });
+
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      stop();
+    } else if (e.key === ' ' || e.code === 'Space') {
+      e.preventDefault();
+      if (playing) stop();
+      else {
+        bar.textContent = '轻触屏幕或按 ESC 停止';
+        play();
+      }
+    }
+  });
+
+  play();
+})();
+</script>
+</body>
+</html>
