@@ -156,7 +156,7 @@
 <body>
   <div class="bg" aria-hidden="true"></div>
   <main class="stage" id="stage"></main>
-  <div class="bar" id="bar">轻触屏幕或按 ESC 停止</div>
+  <div class="bar" id="bar">轻触屏幕收起祝福</div>
 
   <section class="done" id="done">
     <h1 id="doneTitle">生日快乐 🎂</h1>
@@ -293,7 +293,7 @@
 
   again.addEventListener('click', function (e) {
     e.stopPropagation();
-    bar.textContent = '轻触屏幕或按 ESC 停止';
+    bar.textContent = '轻触屏幕收起祝福';
     play();
   });
 
@@ -310,7 +310,7 @@
       e.preventDefault();
       if (playing) stop();
       else {
-        bar.textContent = '轻触屏幕或按 ESC 停止';
+        bar.textContent = '轻触屏幕收起祝福';
         play();
       }
     }
